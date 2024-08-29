@@ -1,0 +1,94 @@
+package com.example.catalog.controller;
+
+import com.example.catalog.model.CatalogModel;
+import com.example.catalog.service.CatalogService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Optional;
+
+@RestController
+@RequestMapping("/api/catalog")
+public class CatalogController {
+
+    @Autowired
+    private CatalogService catalogService;
+
+    // Create a new service
+    @PostMapping
+    public ResponseEntity<CatalogModel> createService(@RequestBody CatalogModel catalogModel) {
+        CatalogModel createdService = catalogService.createService(catalogModel);
+        return new ResponseEntity<>(createdService, HttpStatus.CREATED);
+    }
+
+    // Get all services
+    @GetMapping
+    public ResponseEntity<List<CatalogModel>> getAllServices() {
+        List<CatalogModel> services = catalogService.getAllServices();
+        return new ResponseEntity<>(services, HttpStatus.OK);
+    }
+
+    // Get a single service by ID
+    @GetMapping("/{id}")
+    public ResponseEntity<CatalogModel> getServiceById(@PathVariable Long id) {
+        Optional<CatalogModel> service = catalogService.getServiceById(id);
+        return service.map(ResponseEntity::ok)
+                      .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    }
+
+    // Update a service by ID
+    @PutMapping("/{id}")
+    public ResponseEntity<CatalogModel> updateService(@PathVariable Long id, @RequestBody CatalogModel catalogModel) {
+        CatalogModel updatedService = catalogService.updateService(id, catalogModel);
+        if (updatedService == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(updatedService, HttpStatus.OK);
+    }
+
+    // Delete a service by ID
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteService(@PathVariable Long id) {
+        boolean isDeleted = catalogService.deleteService(id);
+        if (!isDeleted) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+}
+
+
+or-----------------------------------
+@RestController
+public class StudentController {
+
+    @Autowired
+    private StudentService studentService;
+
+    @GetMapping("/students")
+    public List<Student> findAll() {
+        return studentService.findAll();
+    }
+
+    @GetMapping("/students/{id}")
+    public Optional<Student> findById(@PathVariable int id) {
+        return studentService.findById(id);
+    }
+
+    @PostMapping("/students")
+    public void save(@RequestBody Student student) {
+        studentService.save(student);
+    }
+
+    @PutMapping("/students/{id}")
+    public void update(@PathVariable int id, @RequestBody Student student) {
+        studentService.update(id, student);
+    }
+
+    @DeleteMapping("/students/{id}")
+    public void deleteById(@PathVariable int id) {
+        studentService.deleteById(id);
+    }
